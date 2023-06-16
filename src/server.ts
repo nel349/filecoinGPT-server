@@ -22,9 +22,12 @@ APP.use(
 
 
 // request consumer function execution
-APP.post("/sendRequest", async (req:any, res:any) => {
-  const { subscriptionId, consumerAddress, urlSource } = req.body;
+APP.post("/api/generateCar", async (req:any, res:any) => {
+  // const { subscriptionId, consumerAddress, urlSource } = req.body;
 
+  console.log("subscriptionId");
+
+  res.status(200).json({result:"HEYO"});
 });
 
 APP.listen(PORT, () => {
