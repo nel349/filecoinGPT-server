@@ -74,28 +74,32 @@ APP.post("/api/viewFiles", async (req:any, res:any) => {
     } else {
 
 
-      const apiKey = req.body.apiKey;
+      try {
+        const apiKey = req.body.apiKey;
+        console.log("apikeyValue: ", apiKey);
+  
+        // Get an auth token for the data depot service
+        // Note: you can use this token multiple times it expires in 20 days
+        const authToken = await lighthouse.dataDepotAuth(apiKey);
+        console.log("viewFiles authToken: ", authToken);
+  
+        const files = await lighthouse.viewCarFiles(1, authToken.data.access_token);
+        console.log("files: ", files);
+  
+        const fileData = files.data.map((file: any) => {
+          const downloadLink = `https://data-depot.lighthouse.storage/api/download/download_car?fileId=${file.id}.car`;
+          return {
+            fileName: file.fileName,
+            id: file.id,
+            downloadLink: downloadLink
+          }
+        });
+  
+        res.send({message:'Files retrieved successfully', files: fileData});
+      } catch (error) {
+        console.log("error: ", error);
+      }
 
-      console.log("apikeyValue: ", apiKey);
-
-      // Get an auth token for the data depot service
-      // Note: you can use this token multiple times it expires in 20 days
-      const authToken = await lighthouse.dataDepotAuth(apiKey);
-      console.log("viewFiles authToken: ", authToken);
-
-      const files = await lighthouse.viewCarFiles(1, authToken.data.access_token);
-      console.log("files: ", files);
-
-      const fileData = files.data.map((file: any) => {
-        const downloadLink = `https://data-depot.lighthouse.storage/api/download/download_car?fileId=${file.id}.car`;
-        return {
-          fileName: file.fileName,
-          id: file.id,
-          downloadLink: downloadLink
-        }
-      });
-
-      res.send({message:'Files retrieved successfully', files: fileData});
     }
   });
 });
